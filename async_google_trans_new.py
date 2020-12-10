@@ -102,6 +102,7 @@ class google_translator:
         self.url = url_base + "/_/TranslateWebserverUi/data/batchexecute"
         self.timeout = timeout
         self.__session = aiohttp.ClientSession()
+        self._requests = []
 
     def _package_rpc(self, text, lang_src='auto', lang_tgt='auto'):
         GOOGLE_TTS_RPC = ["MkEWBc"]
@@ -157,8 +158,10 @@ class google_translator:
                                        )
                 s.proxy = self.proxies.get("https")
 
-                r = await s
-                for line in (await r.text()).splitlines():
+                async with s as r:
+                    resp = await r.text()
+                
+                for line in (resp).splitlines():
                     decoded_line = line
                     if "MkEWBc" in decoded_line:
                         try:
@@ -243,8 +246,9 @@ class google_translator:
                                        )
                 s.proxy = self.proxies.get("https")
 
-                r = await s
-                for line in (await r.text()).splitlines():
+                async with s as r:
+                    resp = await r.text()
+                for line in (resp).splitlines():
                     decoded_line = line.decode('utf-8')
                     if "MkEWBc" in decoded_line:
                         # regex_str = r"\[\[\"wrb.fr\",\"MkEWBc\",\"\[\[(.*).*?,\[\[\["

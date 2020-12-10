@@ -24,14 +24,44 @@ import async_google_trans_new
  
 async def coro():
     g = async_google_trans_new.google_translator()
-    print(await g.translate("Hello","ja"))
+    print(await g.translate("こんにちは、世界！","en"))
 loop=asyncio.get_event_loop() 
 loop.run_until_complete(coro())
 -> Hello world!
 ```
 ***
 
+=======
+Advanced Usage
+=====
+### Translate 
+### Multi Translate
+```python
+import asyncio
+from async_google_trans_new import google_translator
 
+ 
+async def coro():
+    g = google_translator()
+    texts = ["こんにちは、世界！", "こんばんは、世界！", "おはよう、世界！"]
+    gathers = []
+    for text in texts:
+    	  gathers.append(g.translate(text, "en"))
+    
+    print(await asyncio.gather(*gathers))
+
+loop=asyncio.get_event_loop() 
+loop.run_until_complete(coro())
+-> ['Hello World! ', 'Good evening, the world! ', 'Good morning, the world! '] 
+```
+***
+
+Prerequisites
+====
+* **Python >=3.6**  
+* **aiohttp**  
+* **asyncio**  
+***
   
 License
 ====
