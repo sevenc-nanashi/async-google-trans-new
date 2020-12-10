@@ -1,6 +1,6 @@
 # coding:utf-8
-# author LuShan
-# version : 1.1.9
+# author sevenc_nanashi
+# version : 1.0.0
 import json
 import aiohttp
 import random
