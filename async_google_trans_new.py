@@ -162,10 +162,9 @@ class google_translator:
                     resp = await r.text()
                 
                 for line in (resp).splitlines():
-                    decoded_line = line
-                    if "MkEWBc" in decoded_line:
+                    if "MkEWBc" in line:
                         try:
-                            response = (decoded_line + ']')
+                            response = (line + ']')
                             response = json.loads(response)
                             response = list(response)
                             response = json.loads(response[0][2])
@@ -249,12 +248,11 @@ class google_translator:
                 async with s as r:
                     resp = await r.text()
                 for line in (resp).splitlines():
-                    decoded_line = line.decode('utf-8')
-                    if "MkEWBc" in decoded_line:
+                    if "MkEWBc" in line:
                         # regex_str = r"\[\[\"wrb.fr\",\"MkEWBc\",\"\[\[(.*).*?,\[\[\["
                         try:
-                            # data_got = re.search(regex_str,decoded_line).group(1)
-                            response = (decoded_line + ']')
+                            # data_got = re.search(regex_str,line).group(1)
+                            response = (line + ']')
                             response = json.loads(response)
                             response = list(response)
                             response = json.loads(response[0][2])
