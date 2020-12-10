@@ -31,7 +31,6 @@ loop.run_until_complete(coro())
 ```
 ***
 
-=======
 Advanced Usage
 =====
 ### Translate 
