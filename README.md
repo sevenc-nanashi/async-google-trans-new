@@ -1,14 +1,10 @@
-# google_trans_new
-### Version 1.1.9
+# async_google_trans_new
+### Version 1.0.0
 
-A free and unlimited python API for google translate.  
+This is a library based on [google_trans_new](https://github.com/lushan88a/google_trans_new) but it is async!  
 It's very easy to use and solve the problem that the old api which use tk value cannot be used.  
 This interface is for academic use only, please do not use it for commercial use.  
   
-Version 1.1.9 have fixed url translate.
-Ps:
-If your get translations for different genders, it will return a list.
-https://support.google.com/translate/answer/9179237?p=gendered_translations&hl=zh-Hans&visit_id=637425624803913067-1347870216&rd=1
 ***
   
   
@@ -24,12 +20,16 @@ Basic Usage
 =====
 ### Translate
 ```python
-from google_trans_new import google_translator  
-  
-translator = google_translator()  
-translate_text = translator.translate('สวัสดีจีน',lang_tgt='en')  
-print(translate_text)
--> Hello china
+import asyncio
+import async_google_trans_new  
+
+ 
+async def coro():
+    g = async_google_trans_new.google_translator()
+    print(await g.translate("Hello","ja"))
+loop=asyncio.get_event_loop() 
+loop.run_until_complete(coro())
+-> Hello world!
 ```
 ***
 
