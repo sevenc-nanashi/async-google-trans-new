@@ -62,6 +62,10 @@ Prerequisites
 * **asyncio**  
 ***
   
+Copyrights
+====
+google_trans_new - Copyright (c) 2020 lushan88a https://github.com/lushan88a/google_trans_new/blob/main/LICENSE
+
 License
 ====
 async_google_trans_new is licensed under the MIT License. The terms are as follows:  
