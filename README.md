@@ -62,9 +62,11 @@ Prerequisites
 * **asyncio**  
 ***
   
-Copyrights
+Special Thanks
 ====
 google_trans_new - Copyright (c) 2020 lushan88a https://github.com/lushan88a/google_trans_new/blob/main/LICENSE
+
+***
 
 License
 ====
