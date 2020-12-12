@@ -1,6 +1,3 @@
-# coding:utf-8
-# author sevenc_nanashi
-# version : 1.0.0
 import json
 import aiohttp
 import random
@@ -9,7 +6,7 @@ from urllib.parse import quote
 import urllib3
 import logging
 import aiohttp.web_exceptions
-from constant import LANGUAGES, DEFAULT_SERVICE_URLS
+from .constant import LANGUAGES, DEFAULT_SERVICE_URLS
 import asyncio
 
 log = logging.getLogger(__name__)
