@@ -9,13 +9,13 @@ def _requires_from_file(filename):
 
 setuptools.setup(
     name="async_google_trans_new",
-    version="1.0.0",
+    version="2.0.9",
     author="sevenc_nanashi",
     description="google_trans_new but it is async!",
     long_description=long_desc,
     long_description_content_type='text/markdown',
     url="https://github.com/sevenc-nanashi/async_google_trans_new",
-    packages=setuptools.find_packages("async_google_trans_new"),
+    packages=setuptools.find_packages(),
     install_requires=_requires_from_file('requirements.txt'),
     classifiers=[
         "Programming Language :: Python :: 3.8",

@@ -10,7 +10,11 @@ This interface is for academic use only, please do not use it for commercial use
   
 Installation
 ====
-no way :(
+Run this:
+```bash
+pip install async-google-trans-new
+```
+
 ***
   
   
