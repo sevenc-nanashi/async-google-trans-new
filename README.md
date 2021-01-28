@@ -1,5 +1,5 @@
 # async_google_trans_new
-[![PyPi](https://img.shields.io/pypi/v/async-google-trans-new.svg)](https://pypi.org/project/async-google-trans-new/)
+[![PyPI - Version](https://img.shields.io/pypi/v/async_google_trans_new?style=flat-square) ![PyPI - Downloads](https://img.shields.io/pypi/dm/async_google_trans_new?style=flat-square)](https://pypi.org/project/async-google-trans-new/)
 
 This is a library based on [google_trans_new](https://github.com/lushan88a/google_trans_new) but it is async!  
 It's very easy to use and solve the problem that the old api which use tk value cannot be used.  
