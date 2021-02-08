@@ -62,7 +62,7 @@ class google_new_transError(Exception):
 class google_translator:
     '''
     You can use 108 language in target and source,details view LANGUAGES.
-    Target language: like 'en'、'zh'、'th'...
+    Target language: like 'en', 'zh', 'th'...
 
     :param url_suffix: The source text(s) to be translated. Batch translation is supported via sequence input.
                        The value should be one of the url_suffix listed in : `DEFAULT_SERVICE_URLS`
@@ -121,12 +121,12 @@ class google_translator:
     async def translate(self, text, lang_tgt='auto', lang_src='auto', pronounce=False):
         try:
             try:
-                lang = LANGUAGES[lang_src]
-            except:
+                LANGUAGES[lang_src]
+            except KeyError:
                 lang_src = 'auto'
             try:
-                lang = LANGUAGES[lang_tgt]
-            except:
+                LANGUAGES[lang_tgt]
+            except KeyError:
                 lang_src = 'auto'
             text = str(text)
             if len(text) >= 5000:
@@ -144,7 +144,7 @@ class google_translator:
             freq = self._package_rpc(text, lang_src, lang_tgt)
 
             try:
-                if self.proxies == None or type(self.proxies) != dict:
+                if self.proxies is None or type(self.proxies) != dict:
                     self.proxies = {}
                 timeout = aiohttp.ClientTimeout(total=self.timeout)
                 s = self._session.post(url=self.url,
@@ -172,18 +172,18 @@ class google_translator:
                                     sentences = response[0][5]
                                 else:  # only url
                                     sentences = response[0][0]
-                                    if pronounce == False:
+                                    if pronounce is False:
                                         return sentences
-                                    elif pronounce == True:
+                                    elif pronounce is True:
                                         return [sentences, None, None]
                                 translate_text = ""
                                 for sentence in sentences:
                                     sentence = sentence[0]
                                     translate_text += sentence.strip() + ' '
                                 translate_text = translate_text
-                                if pronounce == False:
+                                if pronounce is False:
                                     return translate_text
-                                elif pronounce == True:
+                                elif pronounce is True:
                                     pronounce_src = (response_[0][0])
                                     pronounce_tgt = (response_[1][0][0][1])
                                     return [translate_text, pronounce_src, pronounce_tgt]
@@ -191,9 +191,9 @@ class google_translator:
                                 sentences = []
                                 for i in response:
                                     sentences.append(i[0])
-                                if pronounce == False:
+                                if pronounce is False:
                                     return sentences
-                                elif pronounce == True:
+                                elif pronounce is True:
                                     pronounce_src = (response_[0][0])
                                     pronounce_tgt = (response_[1][0][0][1])
                                     return [sentences, pronounce_src, pronounce_tgt]
@@ -203,10 +203,10 @@ class google_translator:
                 await s.close()
             except TimeoutError as e:
                 raise e
-            except aiohttp.web_exceptions.HTTPError as e:
+            except aiohttp.web_exceptions.HTTPError:
                 # Request successful, bad response
                 raise google_new_transError(tts=self, response=r)
-            except aiohttp.ClientConnectorError as e:
+            except aiohttp.ClientConnectorError:
                 # Request failed
                 raise google_new_transError(tts=self)
         except Exception as e:
@@ -231,7 +231,7 @@ class google_translator:
             freq = self._package_rpc(text)
 
             try:
-                if self.proxies == None or type(self.proxies) != dict:
+                if self.proxies is None or type(self.proxies) != dict:
                     self.proxies = {}
                 timeout = aiohttp.ClientTimeout(total=self.timeout)
                 s = self._session.post(url=self.url,
@@ -263,10 +263,10 @@ class google_translator:
                 await s.close()
             except TimeoutError as e:
                 raise e
-            except aiohttp.web_exceptions.HTTPError as e:
+            except aiohttp.web_exceptions.HTTPError:
                 # Request successful, bad response
                 raise google_new_transError(tts=self, response=r)
-            except aiohttp.ClientConnectorError as e:
+            except aiohttp.ClientConnectorError:
                 # Request failed
                 raise google_new_transError(tts=self)
         except Exception as e:
@@ -279,3 +279,6 @@ class google_translator:
     def __del__(self):
         loop = asyncio.get_event_loop()
         loop.create_task(self.__session.close())
+
+
+AsyncTranslator = google_translator

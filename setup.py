@@ -5,11 +5,12 @@ with open("README.md", "r", encoding='utf-8') as f:
 
 
 def _requires_from_file(filename):
-    return open(filename,encoding="utf8").read().splitlines()
+    return open(filename, encoding="utf8").read().splitlines()
+
 
 setuptools.setup(
     name="async_google_trans_new",
-    version="1.1.2",
+    version="1.2.0",
     author="sevenc_nanashi",
     description="google_trans_new but it is async!",
     long_description=long_desc,
