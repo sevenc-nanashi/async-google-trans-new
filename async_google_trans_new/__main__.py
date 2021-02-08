@@ -282,3 +282,4 @@ class google_translator:
 
 
 AsyncTranslator = google_translator
+TransError = google_new_transError
