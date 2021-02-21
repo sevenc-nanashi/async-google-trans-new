@@ -8,6 +8,7 @@ import logging
 import aiohttp.web_exceptions
 from .constant import LANGUAGES, DEFAULT_SERVICE_URLS
 import asyncio
+from typing import Union
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
@@ -15,10 +16,10 @@ log.addHandler(logging.NullHandler())
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 URLS_SUFFIX = [re.search('translate.google.(.*)', url.strip()).group(1) for url in DEFAULT_SERVICE_URLS]
-URL_SUFFIX_DEFAULT = 'cn'
+URL_SUFFIX_DEFAULT = 'com'
 
 
-class google_new_transError(Exception):
+class TransError(Exception):
     """Exception that uses context to present a meaningful error message"""
 
     def __init__(self, msg=None, **kwargs):
@@ -30,7 +31,7 @@ class google_new_transError(Exception):
             self.msg = self.infer_msg(self.tts, self.rsp)
         else:
             self.msg = None
-        super(google_new_transError, self).__init__(self.msg)
+        super(TransError, self).__init__(self.msg)
 
     def infer_msg(self, tts, rsp=None):
         cause = "Unknown"
@@ -59,37 +60,30 @@ class google_new_transError(Exception):
         return "{}. Probable cause: {}".format(premise, cause)
 
 
-class google_translator:
+class InvalidLanguageCode(Exception):
+    pass
+
+
+class AsyncTranslator:
     '''
-    You can use 108 language in target and source,details view LANGUAGES.
+    You can use 108 language in target and source, details view LANGUAGES.
     Target language: like 'en', 'zh', 'th'...
 
     :param url_suffix: The source text(s) to be translated. Batch translation is supported via sequence input.
                        The value should be one of the url_suffix listed in : `DEFAULT_SERVICE_URLS`
     :type url_suffix: UTF-8 :class:`str`; :class:`unicode`; string sequence (list, tuple, iterator, generator)
 
-    :param text: The source text(s) to be translated.
-    :type text: UTF-8 :class:`str`; :class:`unicode`;
-
-    :param lang_tgt: The language to translate the source text into.
-                     The value should be one of the language codes listed in : `LANGUAGES`
-    :type lang_tgt: :class:`str`; :class:`unicode`
-
-    :param lang_src: The language of the source text.
-                    The value should be one of the language codes listed in :const:`googletrans.LANGUAGES`
-                    If a language is not specified,
-                    the system will attempt to identify the source language automatically.
-    :type lang_src: :class:`str`; :class:`unicode`
-
     :param timeout: Timeout Will be used for every request.
-    :type timeout: number or a double of numbers
+    :type timeout: number or a double of numbers.
 
     :param proxies: proxies Will be used for every request.
-    :type proxies: class : dict; like: {'http': 'http:171.112.169.47:19934/', 'https': 'https:171.112.169.47:19934/'}
+    :type proxies: :class:`dict`; like: {'http': 'http:171.112.169.47:19934/', 'https': 'https:171.112.169.47:19934/'}
 
+    :param code_sensitive: Raise exception when invalid language code passed or not.
+    :type code_sensitive: :class:`bool`;
     '''
 
-    def __init__(self, url_suffix="cn", timeout=5, proxies=None):
+    def __init__(self, url_suffix="cn", timeout=5, proxies=None, code_sensitive=False):
         self.proxies = proxies
         if url_suffix not in URLS_SUFFIX:
             self.url_suffix = URL_SUFFIX_DEFAULT
@@ -118,19 +112,45 @@ class google_translator:
             self.__session = aiohttp.ClientSession()
         return self.__session
 
-    async def translate(self, text, lang_tgt='auto', lang_src='auto', pronounce=False):
+    async def translate(self, text: str, lang_tgt: str = 'auto', lang_src: str = 'auto', pronounce: bool = False) -> Union[str, list]:
+        """
+        Translates text.
+
+        :param text: The source text(s) to be translated. Can only detect less than 5000 characters.
+        :type text: UTF-8 :class:`str`; :class:`unicode`;
+
+        :param lang_tgt: The language to translate the source text into.
+                        The value should be one of the language codes listed in : `LANGUAGES`
+        :type lang_tgt: :class:`str`; :class:`unicode`;
+
+        :param lang_src: The language of the source text.
+                        The value should be one of the language codes listed in :const:`googletrans.LANGUAGES`
+                        If a language is not specified,
+                        the system will attempt to identify the source language automatically.
+        :type lang_src: :class:`str`; :class:`unicode`;
+
+        :param pronounce: Return pronounce or not.
+        :type pronounce: :class:`bool`;
+
+        :return: Translated text or list.
+        :rtype: Union[str, list]
+        """
         try:
             try:
                 LANGUAGES[lang_src]
             except KeyError:
+                if self.code_sensitive:
+                    raise InvalidLanguageCode(f"Invalid language code passed ({lang_src})")
                 lang_src = 'auto'
             try:
                 LANGUAGES[lang_tgt]
             except KeyError:
-                lang_src = 'auto'
+                if self.code_sensitive:
+                    raise InvalidLanguageCode(f"Invalid language code passed ({lang_tgt})")
+                lang_tgt = 'auto'
             text = str(text)
             if len(text) >= 5000:
-                return "Warning: Can only detect less than 5000 characters"
+                return "Warning: Can only translate less than 5000 characters"
             if len(text) == 0:
                 return ""
             headers = {
@@ -144,7 +164,7 @@ class google_translator:
             freq = self._package_rpc(text, lang_src, lang_tgt)
 
             try:
-                if self.proxies is None or type(self.proxies) != dict:
+                if self.proxies is None or not isinstance(self.proxies, dict):
                     self.proxies = {}
                 timeout = aiohttp.ClientTimeout(total=self.timeout)
                 s = self._session.post(url=self.url,
@@ -157,7 +177,7 @@ class google_translator:
 
                 async with s as r:
                     resp = await r.text()
-                
+
                 for line in (resp).splitlines():
                     if "MkEWBc" in line:
                         try:
@@ -205,15 +225,24 @@ class google_translator:
                 raise e
             except aiohttp.web_exceptions.HTTPError:
                 # Request successful, bad response
-                raise google_new_transError(tts=self, response=r)
+                raise TransError(tts=self, response=r)
             except aiohttp.ClientConnectorError:
                 # Request failed
-                raise google_new_transError(tts=self)
+                raise TransError(tts=self)
         except Exception as e:
             await s.close()
             raise e
 
     async def detect(self, text):
+        """
+        Detects language of text.
+
+        :param text: The source text(s) to be detectd. Can only detect less than 5000 characters.
+        :type text: UTF-8 :class:`str`; :class:`unicode`;
+
+        :return: Language code of text.
+        :rtype: str
+        """
         try:
             text = str(text)
             if len(text) >= 5000:
@@ -231,7 +260,7 @@ class google_translator:
             freq = self._package_rpc(text)
 
             try:
-                if self.proxies is None or type(self.proxies) != dict:
+                if self.proxies is None or not isinstance(self.proxies, dict):
                     self.proxies = {}
                 timeout = aiohttp.ClientTimeout(total=self.timeout)
                 s = self._session.post(url=self.url,
@@ -265,10 +294,10 @@ class google_translator:
                 raise e
             except aiohttp.web_exceptions.HTTPError:
                 # Request successful, bad response
-                raise google_new_transError(tts=self, response=r)
+                raise TransError(tts=self, response=r)
             except aiohttp.ClientConnectorError:
                 # Request failed
-                raise google_new_transError(tts=self)
+                raise TransError(tts=self)
         except Exception as e:
             await s.close()
             raise e
@@ -281,5 +310,5 @@ class google_translator:
         loop.create_task(self.__session.close())
 
 
-AsyncTranslator = google_translator
-TransError = google_new_transError
+google_translator = AsyncTranslator
+google_new_transError = TransError
