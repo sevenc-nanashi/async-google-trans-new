@@ -94,6 +94,7 @@ class AsyncTranslator:
         self.timeout = timeout
         self.__session = aiohttp.ClientSession()
         self._requests = []
+        self.code_sensitive = code_sensitive
 
     def _package_rpc(self, text, lang_src='auto', lang_tgt='auto'):
         GOOGLE_TTS_RPC = ["MkEWBc"]
