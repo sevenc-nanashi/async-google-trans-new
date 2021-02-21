@@ -27,9 +27,10 @@ import async_google_trans_new
 
  
 async def coro():
-    g = async_google_trans_new.google_translator()
+    g = async_google_trans_new.AsyncTranslator()
     print(await g.translate("こんにちは、世界！","en"))
-loop=asyncio.get_event_loop() 
+
+loop = asyncio.get_event_loop() 
 loop.run_until_complete(coro())
 -> Hello world!
 ```
@@ -41,11 +42,11 @@ Advanced Usage
 ### Multi Translate
 ```python
 import asyncio
-from async_google_trans_new import google_translator
+from async_google_trans_new import AsyncTranslator
 
  
 async def coro():
-    g = google_translator()
+    g = AsyncTranslator()
     texts = ["こんにちは、世界！", "こんばんは、世界！", "おはよう、世界！"]
     gathers = []
     for text in texts:
@@ -53,7 +54,7 @@ async def coro():
     
     print(await asyncio.gather(*gathers))
 
-loop=asyncio.get_event_loop() 
+loop = asyncio.get_event_loop() 
 loop.run_until_complete(coro())
 -> ['Hello World! ', 'Good evening, the world! ', 'Good morning, the world! '] 
 ```
