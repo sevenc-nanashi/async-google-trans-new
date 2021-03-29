@@ -1,4 +1,5 @@
 import setuptools
+from async_google_trans_new import __version__
 
 with open("README.md", "r", encoding='utf-8') as f:
     long_desc = f.read()
@@ -10,7 +11,7 @@ def _requires_from_file(filename):
 
 setuptools.setup(
     name="async_google_trans_new",
-    version="1.3.1",
+    version=__version__,
     author="sevenc_nanashi",
     description="google_trans_new but it is async!",
     long_description=long_desc,

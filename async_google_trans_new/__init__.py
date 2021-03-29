@@ -1,1 +1,2 @@
-from .__main__ import AsyncTranslator, TransError, google_translator, google_new_transError
+from .main import AsyncTranslator, TransError, google_translator, google_new_transError  # noqa
+__version__ = "1.4.0"
