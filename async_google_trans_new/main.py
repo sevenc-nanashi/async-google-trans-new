@@ -1,14 +1,17 @@
+import asyncio
 import json
-import aiohttp
+import logging
 import random
 import re
-from urllib.parse import quote
-import urllib3
-import logging
-import aiohttp.web_exceptions
-from .constant import LANGUAGES, DEFAULT_SERVICE_URLS
-import asyncio
 from typing import Union
+from urllib.parse import quote
+
+import aiohttp
+import aiohttp.web_exceptions
+import urllib3
+from debtcollector import moves
+
+from .constant import DEFAULT_SERVICE_URLS, LANGUAGES
 
 log = logging.getLogger(__name__)
 log.addHandler(logging.NullHandler())
@@ -317,5 +320,5 @@ class AsyncTranslator:
         loop.create_task(self.__session.close())
 
 
-google_translator = AsyncTranslator
-google_new_transError = TransError
+google_translator = moves.moved_class(AsyncTranslator, 'google_translator', __name__)
+google_new_transError = moves.moved_class(TransError, 'google_new_transError', __name__)
