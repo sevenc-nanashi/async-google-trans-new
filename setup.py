@@ -10,7 +10,7 @@ def _requires_from_file(filename):
 
 
 setuptools.setup(
-    name="async_google_trans_new",
+    name="async-google-trans-new",
     version=__version__,
     author="sevenc_nanashi",
     description="google_trans_new but it is async!",

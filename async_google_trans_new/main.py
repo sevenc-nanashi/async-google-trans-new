@@ -313,8 +313,13 @@ class AsyncTranslator:
         await self.__session.close()
 
     def __del__(self):
-        loop = asyncio.get_event_loop()
-        if loop.is_closed():
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_closed():
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+
+        except RuntimeError:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
         loop.create_task(self.__session.close())
