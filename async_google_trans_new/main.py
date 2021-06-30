@@ -189,7 +189,7 @@ class AsyncTranslator:
                 for line in (resp).splitlines():
                     if "MkEWBc" in line:
                         try:
-                            response = (line + ']')
+                            response = line
                             response = json.loads(response)
                             response = list(response)
                             response = json.loads(response[0][2])
