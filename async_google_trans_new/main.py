@@ -285,7 +285,7 @@ class AsyncTranslator:
                         # regex_str = r"\[\[\"wrb.fr\",\"MkEWBc\",\"\[\[(.*).*?,\[\[\["
                         try:
                             # data_got = re.search(regex_str,line).group(1)
-                            response = (line + ']')
+                            response = line
                             response = json.loads(response)
                             response = list(response)
                             response = json.loads(response[0][2])
