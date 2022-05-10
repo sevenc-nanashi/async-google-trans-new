@@ -274,9 +274,9 @@ class AsyncTranslator:
                                        data=freq,
                                        headers=headers,
                                        verify_ssl=False,
-                                       timeout=timeout
+                                       timeout=timeout,
+                                       proxy=self.proxies.get("https")
                                        )
-                s.proxy = self.proxies.get("https")
 
                 async with s as r:
                     resp = await r.text()
@@ -285,7 +285,7 @@ class AsyncTranslator:
                         # regex_str = r"\[\[\"wrb.fr\",\"MkEWBc\",\"\[\[(.*).*?,\[\[\["
                         try:
                             # data_got = re.search(regex_str,line).group(1)
-                            response = (line + ']')
+                            response = line
                             response = json.loads(response)
                             response = list(response)
                             response = json.loads(response[0][2])
