@@ -176,8 +176,14 @@ class AsyncTranslator:
                 if self.proxies is None or not isinstance(self.proxies, dict):
                     self.proxies = {}
                 timeout = aiohttp.ClientTimeout(total=self.timeout)
-                s = self._session.post(url=self.url, data=freq, headers=headers, verify_ssl=False, timeout=timeout)
-                s.proxy = self.proxies.get("https")
+                s = self._session.post(
+                    url=self.url,
+                    data=freq,
+                    headers=headers,
+                    verify_ssl=False,
+                    timeout=timeout,
+                    proxy=self.proxies.get("https"),
+                )
 
                 async with s as r:
                     resp = await r.text()
@@ -265,14 +271,8 @@ class AsyncTranslator:
                 self.proxies = {}
             timeout = aiohttp.ClientTimeout(total=self.timeout)
             try:
-                s = self._session.post(
-                    url=self.url,
-                    data=freq,
-                    headers=headers,
-                    verify_ssl=False,
-                    timeout=timeout,
-                    proxy=self.proxies.get("https"),
-                )
+                s = self._session.post(url=self.url, data=freq, headers=headers, verify_ssl=False, timeout=timeout)
+                s.proxy = self.proxies.get("https")
 
                 async with s as r:
                     resp = await r.text()
