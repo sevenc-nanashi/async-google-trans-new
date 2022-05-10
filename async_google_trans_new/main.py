@@ -18,16 +18,16 @@ log.addHandler(logging.NullHandler())
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-URLS_SUFFIX = [re.search('translate.google.(.*)', url.strip()).group(1) for url in DEFAULT_SERVICE_URLS]
-URL_SUFFIX_DEFAULT = 'com'
+URLS_SUFFIX = [re.search("translate.google.(.*)", url.strip()).group(1) for url in DEFAULT_SERVICE_URLS]
+URL_SUFFIX_DEFAULT = "com"
 
 
 class TransError(Exception):
     """Exception that uses context to present a meaningful error message"""
 
     def __init__(self, msg=None, **kwargs):
-        self.tts = kwargs.pop('tts', None)
-        self.rsp = kwargs.pop('response', None)
+        self.tts = kwargs.pop("tts", None)
+        self.rsp = kwargs.pop("response", None)
         if msg:
             self.msg = msg
         elif self.tts is not None:
@@ -68,7 +68,7 @@ class InvalidLanguageCode(Exception):
 
 
 class AsyncTranslator:
-    '''
+    """
     You can use 108 language in target and source, details view LANGUAGES.
     Target language: like 'en', 'zh', 'th'...
 
@@ -87,7 +87,7 @@ class AsyncTranslator:
 
     :param return_list: Return List when multiple results returned or not.
     :type return_list: :class:`bool`;
-    '''
+    """
 
     def __init__(self, url_suffix="cn", timeout=5, proxies=None, code_sensitive=False, return_list=True):
         self.proxies = proxies
@@ -103,12 +103,12 @@ class AsyncTranslator:
         self.code_sensitive = code_sensitive
         self.return_list = return_list
 
-    def _package_rpc(self, text, lang_src='auto', lang_tgt='auto'):
+    def _package_rpc(self, text, lang_src="auto", lang_tgt="auto"):
         GOOGLE_TTS_RPC = ["MkEWBc"]
         parameter = [[text.strip(), lang_src, lang_tgt, True], [1]]
-        escaped_parameter = json.dumps(parameter, separators=(',', ':'))
+        escaped_parameter = json.dumps(parameter, separators=(",", ":"))
         rpc = [[[random.choice(GOOGLE_TTS_RPC), escaped_parameter, None, "generic"]]]
-        espaced_rpc = json.dumps(rpc, separators=(',', ':'))
+        espaced_rpc = json.dumps(rpc, separators=(",", ":"))
         # text_urldecode = quote(text.strip())
         freq_initial = "f.req={}&".format(quote(espaced_rpc))
         freq = freq_initial
@@ -120,7 +120,9 @@ class AsyncTranslator:
             self.__session = aiohttp.ClientSession()
         return self.__session
 
-    async def translate(self, text: str, lang_tgt: str = 'auto', lang_src: str = 'auto', pronounce: bool = False) -> Union[str, list]:
+    async def translate(
+        self, text: str, lang_tgt: str = "auto", lang_src: str = "auto", pronounce: bool = False
+    ) -> Union[str, list]:
         """
         Translates text.
 
@@ -149,13 +151,13 @@ class AsyncTranslator:
             except KeyError:
                 if self.code_sensitive:
                     raise InvalidLanguageCode(f"Invalid language code passed ({lang_src})")
-                lang_src = 'auto'
+                lang_src = "auto"
             try:
                 LANGUAGES[lang_tgt]
             except KeyError:
                 if self.code_sensitive:
                     raise InvalidLanguageCode(f"Invalid language code passed ({lang_tgt})")
-                lang_tgt = 'auto'
+                lang_tgt = "auto"
             text = str(text)
             if len(text) >= 5000:
                 return "Warning: Can only translate less than 5000 characters"
@@ -163,11 +165,10 @@ class AsyncTranslator:
                 return ""
             headers = {
                 "Referer": "http://translate.google.{}/".format(self.url_suffix),
-                "User-Agent":
-                    "Mozilla/5.0 (Windows NT 10.0; WOW64) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/47.0.2526.106 Safari/537.36",
-                "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/47.0.2526.106 Safari/537.36",
+                "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
             }
             freq = self._package_rpc(text, lang_src, lang_tgt)
 
@@ -175,12 +176,7 @@ class AsyncTranslator:
                 if self.proxies is None or not isinstance(self.proxies, dict):
                     self.proxies = {}
                 timeout = aiohttp.ClientTimeout(total=self.timeout)
-                s = self._session.post(url=self.url,
-                                       data=freq,
-                                       headers=headers,
-                                       verify_ssl=False,
-                                       timeout=timeout
-                                       )
+                s = self._session.post(url=self.url, data=freq, headers=headers, verify_ssl=False, timeout=timeout)
                 s.proxy = self.proxies.get("https")
 
                 async with s as r:
@@ -207,13 +203,13 @@ class AsyncTranslator:
                                 translate_text = ""
                                 for sentence in sentences:
                                     sentence = sentence[0]
-                                    translate_text += sentence.strip() + ' '
+                                    translate_text += sentence.strip() + " "
                                 translate_text = translate_text
                                 if pronounce is False:
                                     return translate_text
                                 elif pronounce is True:
-                                    pronounce_src = (response_[0][0])
-                                    pronounce_tgt = (response_[1][0][0][1])
+                                    pronounce_src = response_[0][0]
+                                    pronounce_tgt = response_[1][0][0][1]
                                     return [translate_text, pronounce_src, pronounce_tgt]
                             elif len(response) == 2:
                                 sentences = []
@@ -222,8 +218,8 @@ class AsyncTranslator:
                                 if pronounce is False:
                                     return sentences
                                 elif pronounce is True:
-                                    pronounce_src = (response_[0][0])
-                                    pronounce_tgt = (response_[1][0][0][1])
+                                    pronounce_src = response_[0][0]
+                                    pronounce_tgt = response_[1][0][0][1]
                                     return [sentences, pronounce_src, pronounce_tgt]
                         except Exception as e:
                             raise e
@@ -259,24 +255,24 @@ class AsyncTranslator:
                 return ""
             headers = {
                 "Referer": "http://translate.google.{}/".format(self.url_suffix),
-                "User-Agent":
-                    "Mozilla/5.0 (Windows NT 10.0; WOW64) "
-                    "AppleWebKit/537.36 (KHTML, like Gecko) "
-                    "Chrome/47.0.2526.106 Safari/537.36",
-                "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) "
+                "AppleWebKit/537.36 (KHTML, like Gecko) "
+                "Chrome/47.0.2526.106 Safari/537.36",
+                "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
             }
             freq = self._package_rpc(text)
             if self.proxies is None or not isinstance(self.proxies, dict):
                 self.proxies = {}
             timeout = aiohttp.ClientTimeout(total=self.timeout)
             try:
-                s = self._session.post(url=self.url,
-                                       data=freq,
-                                       headers=headers,
-                                       verify_ssl=False,
-                                       timeout=timeout,
-                                       proxy=self.proxies.get("https")
-                                       )
+                s = self._session.post(
+                    url=self.url,
+                    data=freq,
+                    headers=headers,
+                    verify_ssl=False,
+                    timeout=timeout,
+                    proxy=self.proxies.get("https"),
+                )
 
                 async with s as r:
                     resp = await r.text()
@@ -325,5 +321,5 @@ class AsyncTranslator:
         loop.create_task(self.__session.close())
 
 
-google_translator = moves.moved_class(AsyncTranslator, 'google_translator', __name__)
-google_new_transError = moves.moved_class(TransError, 'google_new_transError', __name__)
+google_translator = moves.moved_class(AsyncTranslator, "google_translator", __name__)
+google_new_transError = moves.moved_class(TransError, "google_new_transError", __name__)
