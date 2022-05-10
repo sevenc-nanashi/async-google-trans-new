@@ -179,9 +179,9 @@ class AsyncTranslator:
                                        data=freq,
                                        headers=headers,
                                        verify_ssl=False,
-                                       timeout=timeout
+                                       timeout=timeout,
+                                       proxy = self.proxies.get("https")
                                        )
-                s.proxy = self.proxies.get("https")
 
                 async with s as r:
                     resp = await r.text()
@@ -274,9 +274,9 @@ class AsyncTranslator:
                                        data=freq,
                                        headers=headers,
                                        verify_ssl=False,
-                                       timeout=timeout,
-                                       proxy=self.proxies.get("https")
+                                       timeout=timeout
                                        )
+                s.proxy = self.proxies.get("https")
 
                 async with s as r:
                     resp = await r.text()
