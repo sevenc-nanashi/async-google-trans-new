@@ -3,3 +3,4 @@ build/
 dist/
 async_google_trans_new.egg-info/
 setup.bat
+.idea/
