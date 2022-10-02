@@ -89,7 +89,7 @@ class AsyncTranslator:
     :type return_list: :class:`bool`;
     """
 
-    def __init__(self, url_suffix="cn", timeout=5, proxies=None, code_sensitive=False, return_list=True):
+    def __init__(self, url_suffix="com", timeout=5, proxies=None, code_sensitive=False, return_list=True):
         self.proxies = proxies
         if url_suffix not in URLS_SUFFIX:
             self.url_suffix = URL_SUFFIX_DEFAULT
